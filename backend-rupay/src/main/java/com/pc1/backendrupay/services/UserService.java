@@ -15,12 +15,15 @@ public class UserService {
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     public List<UserModel> listUsers() {
         return userRepository.findAll();
     }
+
     public Optional<UserModel> listUserById(Long id) {
         return userRepository.findById(id);
     }
+
     public UserModel createUser(UserDTO userDTO) {
         UserModel user = new UserModel(userDTO);
         return userRepository.save(user);

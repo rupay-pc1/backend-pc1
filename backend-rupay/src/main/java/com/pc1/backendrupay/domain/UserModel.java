@@ -22,6 +22,7 @@ public class UserModel {
     private String password;
     private String typeUser;
     private String registration;
+
     public UserModel(UserDTO userDTO){
         this.name = userDTO.name();
         this.email = userDTO.email();
@@ -29,4 +30,5 @@ public class UserModel {
         this.typeUser = userDTO.typeUser();
         this.registration = userDTO.registration();
     }
+
 }

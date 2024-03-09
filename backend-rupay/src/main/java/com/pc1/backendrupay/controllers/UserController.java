@@ -17,11 +17,13 @@ public class UserController {
     public UserController(UserService userService){
         this.userService = userService;
     }
+
     @PostMapping
     public ResponseEntity<UserModel> createUser(@RequestBody UserDTO userDTO){
         UserModel user = this.userService.createUser(userDTO);
         return ResponseEntity.ok().body(user);
     }
+
     @GetMapping
     public List<UserModel> listUsers(){
         return userService.listUsers();
@@ -31,4 +33,5 @@ public class UserController {
     public <Optional> java.util.Optional<UserModel> listUserById(@PathVariable("id") Long id){
         return userService.listUserById(id);
     }
+    
 }
