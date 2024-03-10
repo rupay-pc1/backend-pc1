@@ -33,5 +33,11 @@ public class UserController {
     public <Optional> java.util.Optional<UserModel> listUserById(@PathVariable("id") Long id){
         return userService.listUserById(id);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Long> deleteUser(@PathVariable("id") Long id){
+        userService.deleteUser(id);
+        return ResponseEntity.ok().body(id);
+    }
     
 }
