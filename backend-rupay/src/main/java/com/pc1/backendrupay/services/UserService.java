@@ -38,4 +38,8 @@ public class UserService {
     public Optional<UserModel> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    public Optional<UserModel> listUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }

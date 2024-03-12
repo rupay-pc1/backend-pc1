@@ -19,12 +19,6 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<UserModel> createUser(@RequestBody UserDTO userDTO){
-        UserModel user = this.userService.createUser(userDTO);
-        return ResponseEntity.ok().body(user);
-    }
-
     @GetMapping("/list")
     public List<UserModel> listUsers(){
         return userService.listUsers();
@@ -33,6 +27,11 @@ public class UserController {
     @GetMapping("/{id}")
     public <Optional> java.util.Optional<UserModel> listUserById(@PathVariable("id") UUID id){
         return userService.listUserById(id);
+    }
+
+    @GetMapping("/email/{email}")
+    public <Optional> java.util.Optional<UserModel> listUserByEmail(@PathVariable("email") String email){
+        return userService.listUserByEmail(email);
     }
     
 }
