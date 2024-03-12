@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -16,11 +17,15 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public Optional<UserModel> getUserByName(String name) {
+        return userRepository.findByName(name);
+    }
+
     public List<UserModel> listUsers() {
         return userRepository.findAll();
     }
 
-    public Optional<UserModel> listUserById(Long id) {
+    public Optional<UserModel> listUserById(UUID id) {
         return userRepository.findById(id);
     }
 
@@ -30,4 +35,7 @@ public class UserService {
 
     }
 
+    public Optional<UserModel> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }
