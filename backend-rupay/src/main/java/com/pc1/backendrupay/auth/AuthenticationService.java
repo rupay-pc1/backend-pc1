@@ -35,6 +35,8 @@ public class AuthenticationService {
         TypeUser typeuser = switch (request.getTypeUser()) {
             case "STUDENT" -> TypeUser.STUDENT;
             case "ADMIN" -> TypeUser.ADMIN;
+            case "SCHOLARSHIP_STUDENT" -> TypeUser.SCHOLARSHIP_STUDENT;
+
             default -> TypeUser.EXTERNAL;
         };
 
