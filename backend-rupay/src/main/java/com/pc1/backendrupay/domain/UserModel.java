@@ -24,7 +24,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
-public class UserModel implements UserDetails, Serializable {
+public class UserModel implements UserDetails {
 
     @Serial
     private static final long serialVersionUID = 1L;
