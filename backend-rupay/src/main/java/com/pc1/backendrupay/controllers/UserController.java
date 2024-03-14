@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * This class represents the controller layer for managing user-related operations.
@@ -29,24 +30,8 @@ public class UserController {
         this.userService = userService;
     }
 
-    /**
-     * Create a new user.
-     * 
-     * @param userDTO the UserDTO object containing the user data
-     * @return a ResponseEntity with the created UserModel object
-     */
-    @PostMapping
-    public ResponseEntity<UserModel> createUser(@RequestBody UserDTO userDTO){
-        UserModel user = this.userService.createUser(userDTO);
-        return ResponseEntity.ok().body(user);
-    }
 
-    /**
-     * Get a list of all users.
-     * 
-     * @return a List of UserModel objects representing all users
-     */
-    @GetMapping
+    @GetMapping("/list")
     public List<UserModel> listUsers(){
         return userService.listUsers();
     }
@@ -58,7 +43,7 @@ public class UserController {
      * @return an Optional containing the UserModel object if found, or an empty Optional if not found
      */
     @GetMapping("/{id}")
-    public <Optional> java.util.Optional<UserModel> listUserById(@PathVariable("id") Long id){
+    public <Optional> java.util.Optional<UserModel> listUserById(@PathVariable("id") UUID id){
         return userService.listUserById(id);
     }
 
@@ -97,6 +82,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         return ResponseEntity.ok().body(id);
+      
+    @GetMapping("/email/{email}")
+    public <Optional> java.util.Optional<UserModel> listUserByEmail(@PathVariable("email") String email){
+        return userService.listUserByEmail(email);
     }
     
 }

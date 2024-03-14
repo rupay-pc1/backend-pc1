@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * This class represents the service layer for managing user-related operations.
@@ -29,6 +30,10 @@ public class UserService {
      * Retrieves a list of all users.
      * @return a list of UserModel objects representing the users
      */
+    public Optional<UserModel> getUserByName(String name) {
+        return userRepository.findByName(name);
+    }
+  
     public List<UserModel> listUsers() {
         return userRepository.findAll();
     }
@@ -38,7 +43,8 @@ public class UserService {
      * @param id the ID of the user to retrieve
      * @return an Optional containing the UserModel if found, or an empty Optional if not found
      */
-    public Optional<UserModel> listUserById(Long id) {
+
+    public Optional<UserModel> listUserById(UUID id) {
         return userRepository.findById(id);
     }
 
@@ -93,4 +99,11 @@ public class UserService {
         }
     }
 
+    public Optional<UserModel> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    public Optional<UserModel> listUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 }
