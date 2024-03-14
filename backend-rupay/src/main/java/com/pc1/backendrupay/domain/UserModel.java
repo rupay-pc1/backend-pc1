@@ -2,6 +2,7 @@ package com.pc1.backendrupay.domain;
 
 import com.pc1.backendrupay.enums.TypeUser;
 import jakarta.persistence.*;
+
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +14,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This class represents the model for a user.
+ */
 @Entity
 @Table(name = "tb_user")
 @AllArgsConstructor
@@ -30,10 +34,16 @@ public class UserModel implements UserDetails, Serializable {
     private String name;
     private String email;
     private String password;
+
     @Enumerated(EnumType.STRING)
     private TypeUser typeUser;
-    private String registration;
+    private String registration; // Optional attribute
 
+    /**
+     * Constructor for the UserModel class that takes a UserDTO object as a parameter.
+     * 
+     * @param userDTO the UserDTO object containing the user data
+     */
     public UserModel(UserDTO userDTO){
         this.name = userDTO.name();
         this.email = userDTO.email();

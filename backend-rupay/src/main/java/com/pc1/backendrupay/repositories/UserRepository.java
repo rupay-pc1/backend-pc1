@@ -6,10 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.UUID;
-
+/**
+ * This interface represents the repository for user data access.
+ */
 @Repository
 public interface UserRepository extends JpaRepository<UserModel, UUID> {
     Optional<UserModel> findByName(String name);
     Optional<UserModel> findByEmail(String email);
-
 }
