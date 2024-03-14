@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BackendRupayApplication<backend-rupay>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.pc1.backendrupay.BackendRupayApplication",
+            "projectName": "backend-rupay",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
