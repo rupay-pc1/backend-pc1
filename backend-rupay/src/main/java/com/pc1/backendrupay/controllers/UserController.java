@@ -3,8 +3,10 @@ package com.pc1.backendrupay.controllers;
 import com.pc1.backendrupay.domain.UserDTO;
 import com.pc1.backendrupay.domain.UserModel;
 import com.pc1.backendrupay.services.UserService;
+import com.pc1.backendrupay.services.UserServiceImpl;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,14 +21,15 @@ import java.util.UUID;
 @RequestMapping("/api/user")
 public class UserController {
 
-    private UserService userService;
+    @Autowired
+    final private UserService userService;
 
     /**
      * Constructor for UserController.
      * 
      * @param userService the UserService instance to be used
      */
-    public UserController(UserService userService){
+    public UserController(UserServiceImpl userService){
         this.userService = userService;
     }
 
@@ -56,7 +59,7 @@ public class UserController {
      * or a ResponseEntity with an error message if the user is not found
      */
     @PutMapping("/{id}")
-    public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody UserDTO userDTO) {
+    public ResponseEntity<?> editUser(@PathVariable UUID id, @RequestBody UserDTO userDTO) {
         UserModel user;
 
         try {
@@ -75,17 +78,17 @@ public class UserController {
      * or a ResponseEntity with an error message if the user is not found
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id){
+    public ResponseEntity<?> deleteUser(@PathVariable("id") UUID id) {
         try {
             userService.deleteUser(id);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
         return ResponseEntity.ok().body(id);
-      
+    }
     @GetMapping("/email/{email}")
     public <Optional> java.util.Optional<UserModel> listUserByEmail(@PathVariable("email") String email){
-        return userService.listUserByEmail(email);
+        return userService.getUserByEmail(email);
     }
     
 }

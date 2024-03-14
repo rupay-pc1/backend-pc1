@@ -1,7 +1,7 @@
 package com.pc1.backendrupay.auth;
 
 import com.pc1.backendrupay.domain.UserModel;
-import com.pc1.backendrupay.services.UserService;
+import com.pc1.backendrupay.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationController {
     @Autowired
-    UserService userService;
+    UserServiceImpl userService;
 
     private final AuthenticationService service;
 
