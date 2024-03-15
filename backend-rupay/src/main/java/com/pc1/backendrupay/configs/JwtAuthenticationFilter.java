@@ -32,7 +32,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         if (request.getServletPath().contains("/api/auth")) {
-            System.out.println("--------------------------------------------------");
             filterChain.doFilter(request, response);
             return;
         }
@@ -46,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         jwt = authHeader.substring(7);
         email = jwtService.extractUsername(jwt);
-        System.out.println(email);
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
             var isTokenValid = tokenRepository.findByToken(jwt)
