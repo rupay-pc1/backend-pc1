@@ -68,7 +68,7 @@ public class AuthenticationService {
                     )
             );
         } catch (AuthenticationException e) {
-        throw new IllegalStateException(e);
+            throw new IllegalStateException(e);
         }
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
