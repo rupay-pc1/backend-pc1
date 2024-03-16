@@ -13,6 +13,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+import org.springframework.web.cors.CorsConfiguration;
 
 @Configuration
 @EnableWebSecurity
@@ -25,15 +26,17 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, HandlerMappingIntrospector introspector) throws Exception {
+        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        corsConfiguration.addAllowedOriginPattern("*"); // Permitir todas as origens
+        corsConfiguration.addAllowedMethod("*"); // Permitir todos os métodos (GET, POST, PUT, DELETE, etc.)
+        corsConfiguration.addAllowedHeader("*"); // Permitir todos os cabeçalhos
+        corsConfiguration.setAllowCredentials(true); // Permitir credenciais
 
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(request -> corsConfiguration)) // Aplicar a configuração CORS
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/error/**").permitAll();
-                    //TODO Nesse local, esta permitindo que qualquer um acesse a API, para qualquer endpoint
-//                                // É necessário corrigir isso, quando os endpoints estiverem prontos, através do uso de hasAuthority
-//                                // Atribuindo a permissão de acesso a cada endpoint
                     auth.requestMatchers("/api/**").permitAll();
                     auth.requestMatchers("/api/auth/**").permitAll();
                     auth.anyRequest().authenticated();
@@ -47,6 +50,7 @@ public class SecurityConfiguration {
                 )
                 .build();
     }
+}
 
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -74,7 +78,7 @@ public class SecurityConfiguration {
 //
 //        return http.build();
 //    }
-}
+//}
 
 
 
