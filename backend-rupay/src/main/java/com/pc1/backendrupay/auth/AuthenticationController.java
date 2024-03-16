@@ -1,6 +1,8 @@
 package com.pc1.backendrupay.auth;
 
 import com.pc1.backendrupay.domain.UserModel;
+import com.pc1.backendrupay.exceptions.RegistrationInUseException;
+import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,14 +34,21 @@ public class AuthenticationController {
         if (userOp.isPresent()) {
              return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(service.register(request));
+
+        AuthenticationResponse response;
+        try {
+            response = service.register(request);
+        } catch (RegistrationInUseException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok(response);
     }
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request
     ) {
         AuthenticationResponse response;
-        
+
         try {
             response = service.authenticate(request);
         } catch (IllegalStateException e) {

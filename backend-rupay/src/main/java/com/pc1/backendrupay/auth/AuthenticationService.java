@@ -4,6 +4,8 @@ package com.pc1.backendrupay.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pc1.backendrupay.configs.JwtService;
 import com.pc1.backendrupay.enums.TypeUser;
+import com.pc1.backendrupay.exceptions.RegistrationInUseException;
+import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.UserRepository;
 import com.pc1.backendrupay.token.Token;
 import com.pc1.backendrupay.token.TokenRepository;
@@ -31,7 +33,9 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse register(RegisterRequest request) throws RegistrationInUseException{
+        checkRegistration(request.getRegistration());
+
         TypeUser typeuser = switch (request.getTypeUser()) {
             case "STUDENT" -> TypeUser.STUDENT;
             case "ADMIN" -> TypeUser.ADMIN;
@@ -147,6 +151,14 @@ public class AuthenticationService {
             storedToken.setExpired(true);
             storedToken.setRevoked(true);
             tokenRepository.save(storedToken);
+        }
+    }
+
+    private void checkRegistration(String registration) throws RegistrationInUseException{
+        for (UserModel user : repository.findAll()) {
+            if (user.getRegistration().replaceAll("\\s", "").equals(registration.replaceAll("\\s", ""))) {
+                throw new RegistrationInUseException("Registration already in use");
+            }
         }
     }
 }
