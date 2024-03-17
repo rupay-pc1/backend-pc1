@@ -1,5 +1,7 @@
 package com.pc1.backendrupay.token;
 
+import com.pc1.backendrupay.domain.UserModel;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,4 +19,10 @@ public interface TokenRepository extends JpaRepository<Token, Integer> {
     List<Token> findAllValidTokenByUser(UUID id);
 
     Optional<Token> findByToken(String token);
+
+
+    @Transactional
+    void deleteAllByUser(UserModel user);
+
+
 }

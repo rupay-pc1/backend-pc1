@@ -5,6 +5,8 @@ import com.pc1.backendrupay.domain.UserModel;
 import com.pc1.backendrupay.repositories.UserRepository;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 
+import com.pc1.backendrupay.token.Token;
+import com.pc1.backendrupay.token.TokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,13 +22,17 @@ public class UserServiceImpl  implements UserService{
     @Autowired
     final private UserRepository userRepository;
 
+    @Autowired
+    final private TokenRepository tokenRepository;
+
     /**
      * Constructs a new UserService with the given UserRepository.
      * @param userRepository the repository for user data access
      */
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
+        this.tokenRepository = tokenRepository;
     }
 
     /**
@@ -82,6 +88,7 @@ public class UserServiceImpl  implements UserService{
     @Override
     public void deleteUser(UUID id) throws UserNotFoundException{
         checkUser(id);
+        tokenRepository.deleteAllByUser(userRepository.findById(id).get());
         userRepository.deleteById(id);
     }
 

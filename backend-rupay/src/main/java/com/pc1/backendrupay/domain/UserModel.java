@@ -1,6 +1,8 @@
 package com.pc1.backendrupay.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pc1.backendrupay.enums.TypeUser;
+import com.pc1.backendrupay.token.Token;
 import jakarta.persistence.*;
 
 import lombok.*;
@@ -37,6 +39,7 @@ public class UserModel implements UserDetails {
     @Enumerated(EnumType.STRING)
     private TypeUser typeUser;
     private String registration; // Optional attribute
+
 
     /**
      * Constructor for the UserModel class that takes a UserDTO object as a parameter.

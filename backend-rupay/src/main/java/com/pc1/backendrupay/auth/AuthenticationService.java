@@ -7,12 +7,14 @@ import com.pc1.backendrupay.enums.TypeUser;
 import com.pc1.backendrupay.exceptions.RegistrationInUseException;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.UserRepository;
+import com.pc1.backendrupay.services.UserService;
 import com.pc1.backendrupay.token.Token;
 import com.pc1.backendrupay.token.TokenRepository;
 import com.pc1.backendrupay.token.TokenType;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,6 +34,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+
 
     public AuthenticationResponse register(RegisterRequest request) throws RegistrationInUseException{
         checkRegistration(request.getRegistration());
