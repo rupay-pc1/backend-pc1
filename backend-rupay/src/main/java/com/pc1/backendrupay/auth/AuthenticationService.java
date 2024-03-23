@@ -10,10 +10,14 @@ import com.pc1.backendrupay.repositories.UserRepository;
 import com.pc1.backendrupay.token.Token;
 import com.pc1.backendrupay.token.TokenRepository;
 import com.pc1.backendrupay.token.TokenType;
+import com.pc1.backendrupay.email.EmailServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -32,6 +36,10 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailServiceImpl emailService;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     public AuthenticationResponse register(RegisterRequest request) throws RegistrationInUseException{
         checkRegistration(request.getRegistration());
@@ -85,6 +93,22 @@ public class AuthenticationService {
                 .accessToken(jwtToken)
                 .refreshToken(refreshToken)
 
+                .build();
+    }
+
+    public AuthenticationResponse resetPassword(String email) throws UserNotFoundException{
+        var user = repository.findByEmail(email)
+                .orElseThrow();
+        var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+        //revokeAllUserTokens(user);
+        saveUserToken(user, jwtToken);
+
+        mailSender.send(emailService.constructResetTokenEmail("http://localhost:8081", jwtToken, email));
+
+        return AuthenticationResponse.builder()
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 

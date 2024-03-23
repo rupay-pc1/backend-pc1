@@ -7,9 +7,11 @@ import com.pc1.backendrupay.services.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,6 +57,19 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<AuthenticationResponse> resetPassword(
+            @RequestParam String email
+    ) {
+        try {
+            System.out.println(email);
+            service.resetPassword(email);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh-token")
