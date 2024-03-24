@@ -1,6 +1,7 @@
 package com.pc1.backendrupay.auth;
 
 import com.pc1.backendrupay.domain.UserModel;
+import com.pc1.backendrupay.exceptions.InvalidTokenException;
 import com.pc1.backendrupay.exceptions.RegistrationInUseException;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.services.UserServiceImpl;
@@ -75,13 +76,12 @@ public class AuthenticationController {
 
     @PostMapping("/change-password")
     public ResponseEntity<AuthenticationResponse> changePassword(
-            HttpServletRequest request,
-            HttpServletResponse response,
+            @RequestParam String token,
             @RequestParam String password
     ) {
         try {
-            service.changePassword(request, response, password);
-        } catch (UserNotFoundException e) {
+            service.changePassword(token, password);
+        } catch (UserNotFoundException | InvalidTokenException e) {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();

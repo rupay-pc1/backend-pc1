@@ -4,6 +4,7 @@ package com.pc1.backendrupay.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pc1.backendrupay.configs.JwtService;
 import com.pc1.backendrupay.enums.TypeUser;
+import com.pc1.backendrupay.exceptions.InvalidTokenException;
 import com.pc1.backendrupay.exceptions.RegistrationInUseException;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.UserRepository;
@@ -109,28 +110,17 @@ public class AuthenticationService {
                 .build();
     }
 
-    public void changePassword(HttpServletRequest request, HttpServletResponse response, String password) throws UserNotFoundException{
-        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String jwt;
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
-            return; // Token invalido
-        }
-        jwt = authHeader.substring(7);
-        var storedToken = tokenRepository.findByToken(jwt)
-                .orElse(null);
-        if (storedToken != null) {
-            storedToken.setExpired(true);
-            storedToken.setRevoked(true);
-            tokenRepository.save(storedToken);
-        }
-
+    public void changePassword(String token, String password) throws UserNotFoundException, InvalidTokenException{
         var email = jwtService.extractUsername(token.toString());
-        if (email == null) throw new UserNotFoundException("Invalid token");
-
+        if (email == null) throw new UserNotFoundException("User not found");
         var user = repository.findByEmail(email)
                 .orElseThrow();
-        user.setPassword(passwordEncoder.encode(password));
-        repository.save(user);
+
+        if(jwtService.isTokenValid(token, user)) {
+            user.setPassword(passwordEncoder.encode(password));
+            repository.save(user);
+        }
+        else throw new InvalidTokenException("Invalid token");
     }
 
     private void saveUserToken(UserModel user, String jwtToken) {
