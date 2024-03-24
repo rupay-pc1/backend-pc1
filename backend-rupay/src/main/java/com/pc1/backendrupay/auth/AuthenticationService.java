@@ -115,9 +115,21 @@ public class AuthenticationService {
         if (email == null) throw new UserNotFoundException("User not found");
         var user = repository.findByEmail(email)
                 .orElseThrow();
+        var jwt = tokenRepository.findByToken(token) 
+                    .orElse(null);
 
-        if(jwtService.isTokenValid(token, user)) {
+        if(jwt != null && !jwt.isRevoked() && jwtService.isTokenValid(token, user)) {
             user.setPassword(passwordEncoder.encode(password));
+            revokeAllUserTokens(user);
+            /* 
+            var jwt = tokenRepository.findByToken(token) 
+                    .orElse(null);
+            if(jwt != null) {
+                jwt.setExpired(true);
+                jwt.setRevoked(true);
+                tokenRepository.save(jwt);
+                System.out.println(jwt);
+            } */
             repository.save(user);
         }
         else throw new InvalidTokenException("Invalid token");

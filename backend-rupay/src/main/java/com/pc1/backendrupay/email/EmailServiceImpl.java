@@ -32,7 +32,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     public SimpleMailMessage constructResetTokenEmail(String contextPath, String token, String userEmail) {
-        String url = contextPath + "/auth/changePassword?token=" + token;
+        String url = contextPath + "/api/auth/change-password?token=" + token;
         //String message = messages.getMessage("message.resetPassword", null, locale);
         return constructEmail("Reset Password", "Click here to change your password:" + " \r\n" + url, userEmail);
     }
