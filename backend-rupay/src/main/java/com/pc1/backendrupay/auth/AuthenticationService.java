@@ -8,10 +8,11 @@ import com.pc1.backendrupay.exceptions.InvalidTokenException;
 import com.pc1.backendrupay.exceptions.RegistrationInUseException;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.UserRepository;
+import com.pc1.backendrupay.services.EmailService;
 import com.pc1.backendrupay.token.Token;
 import com.pc1.backendrupay.token.TokenRepository;
 import com.pc1.backendrupay.token.TokenType;
-import com.pc1.backendrupay.email.EmailServiceImpl;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final EmailServiceImpl emailService;
+    private final EmailService emailService;
 
     @Autowired
     private JavaMailSender mailSender;
