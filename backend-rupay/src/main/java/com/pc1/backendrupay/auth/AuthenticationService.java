@@ -100,16 +100,37 @@ public class AuthenticationService {
         var user = repository.findByEmail(email)
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
-        var refreshToken = jwtService.generateRefreshToken(user);
-        //revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
 
         mailSender.send(emailService.constructResetTokenEmail("http://localhost:8081", jwtToken, email));
 
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
-                .refreshToken(refreshToken)
                 .build();
+    }
+
+    public void changePassword(HttpServletRequest request, HttpServletResponse response, String password) throws UserNotFoundException{
+        final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        final String jwt;
+        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+            return; // Token invalido
+        }
+        jwt = authHeader.substring(7);
+        var storedToken = tokenRepository.findByToken(jwt)
+                .orElse(null);
+        if (storedToken != null) {
+            storedToken.setExpired(true);
+            storedToken.setRevoked(true);
+            tokenRepository.save(storedToken);
+        }
+
+        var email = jwtService.extractUsername(token.toString());
+        if (email == null) throw new UserNotFoundException("Invalid token");
+
+        var user = repository.findByEmail(email)
+                .orElseThrow();
+        user.setPassword(passwordEncoder.encode(password));
+        repository.save(user);
     }
 
     private void saveUserToken(UserModel user, String jwtToken) {
@@ -180,7 +201,7 @@ public class AuthenticationService {
 
     private void checkRegistration(String registration) throws RegistrationInUseException{
         for (UserModel user : repository.findAll()) {
-            if (user.getRegistration().replaceAll("\\s", "").equals(registration.replaceAll("\\s", ""))) {
+            if (user.getRegistration().replaceAll("\\s", "").equals(registration.replaceAll("\\s", "")) && !user.getRegistration().equals("")) {
                 throw new RegistrationInUseException("Registration already in use");
             }
         }

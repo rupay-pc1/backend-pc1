@@ -4,6 +4,8 @@ import com.pc1.backendrupay.domain.UserModel;
 import com.pc1.backendrupay.exceptions.RegistrationInUseException;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.services.UserServiceImpl;
+import com.pc1.backendrupay.token.Token;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -64,8 +66,21 @@ public class AuthenticationController {
             @RequestParam String email
     ) {
         try {
-            System.out.println(email);
             service.resetPassword(email);
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.badRequest().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<AuthenticationResponse> changePassword(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            @RequestParam String password
+    ) {
+        try {
+            service.changePassword(request, response, password);
         } catch (UserNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
