@@ -67,11 +67,14 @@ public class AuthenticationController {
             @RequestParam String email
     ) {
         try {
-            service.resetPassword(email);
+            if(service.resetPassword(email)) {
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
         } catch (UserNotFoundException e) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/change-password")

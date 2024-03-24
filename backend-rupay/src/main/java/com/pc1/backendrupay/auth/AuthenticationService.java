@@ -13,6 +13,7 @@ import com.pc1.backendrupay.token.Token;
 import com.pc1.backendrupay.token.TokenRepository;
 import com.pc1.backendrupay.token.TokenType;
 
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.pc1.backendrupay.domain.UserModel;
 
-
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Service
@@ -98,22 +99,26 @@ public class AuthenticationService {
                 .build();
     }
 
-    public AuthenticationResponse resetPassword(String email) throws UserNotFoundException{
+    public boolean resetPassword(String email) throws UserNotFoundException{
         var user = repository.findByEmail(email)
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         saveUserToken(user, jwtToken);
 
-        mailSender.send(emailService.constructResetTokenEmail("http://localhost:8081", jwtToken, email));
+        //mailSender.send(emailService.constructResetTokenEmail("http://localhost:8081", jwtToken, email));
+        try {
+            emailService.constructResetTokenEmail("http://localhost:8081", jwtToken, email);
+        } catch (FileNotFoundException | MessagingException e) {
+            return false;
+        }
 
-        return AuthenticationResponse.builder()
-                .accessToken(jwtToken)
-                .build();
+        return true;
     }
 
     public void changePassword(String token, String password) throws UserNotFoundException, InvalidTokenException{
         var email = jwtService.extractUsername(token.toString());
         if (email == null) throw new UserNotFoundException("User not found");
+
         var user = repository.findByEmail(email)
                 .orElseThrow();
         var jwt = tokenRepository.findByToken(token) 
@@ -122,15 +127,6 @@ public class AuthenticationService {
         if(jwt != null && !jwt.isRevoked() && jwtService.isTokenValid(token, user)) {
             user.setPassword(passwordEncoder.encode(password));
             revokeAllUserTokens(user);
-            /* 
-            var jwt = tokenRepository.findByToken(token) 
-                    .orElse(null);
-            if(jwt != null) {
-                jwt.setExpired(true);
-                jwt.setRevoked(true);
-                tokenRepository.save(jwt);
-                System.out.println(jwt);
-            } */
             repository.save(user);
         }
         else throw new InvalidTokenException("Invalid token");
@@ -204,7 +200,7 @@ public class AuthenticationService {
 
     private void checkRegistration(String registration) throws RegistrationInUseException{
         for (UserModel user : repository.findAll()) {
-            if (user.getRegistration().replaceAll("\\s", "").equals(registration.replaceAll("\\s", "")) && !user.getRegistration().equals("")) {
+            if (!user.getRegistration().equals("") && user.getRegistration().replaceAll("\\s", "").equals(registration.replaceAll("\\s", ""))) {
                 throw new RegistrationInUseException("Registration already in use");
             }
         }
