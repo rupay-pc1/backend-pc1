@@ -4,9 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.pc1.backendrupay.enums.TypeTicket;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.io.Serial;
-import java.util.ArrayList;
 import java.util.UUID;
 
 @Entity

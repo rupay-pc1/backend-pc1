@@ -17,10 +17,14 @@ import java.util.UUID;
 public class TicketController {
 
     @Autowired
-    private TicketService ticketService;
+    final private TicketService ticketService;
 
-    @PostMapping("/buy/{id}")
-    public ResponseEntity<?> buyTicket(@RequestParam UUID id, @RequestBody TypeTicket typeTicket) throws UserNotFoundException {
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
+    }
+
+    @PostMapping("/buy/{id}/{typeTicket}")
+    public ResponseEntity<?> buyTicket(@PathVariable UUID id, @PathVariable TypeTicket typeTicket) throws UserNotFoundException {
         TicketModel ticket = ticketService.buyTicket(id, typeTicket);
         return new ResponseEntity<TicketModel>(ticket, HttpStatus.CREATED);
     }

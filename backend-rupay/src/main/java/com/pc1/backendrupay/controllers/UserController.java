@@ -33,7 +33,6 @@ public class UserController {
         this.userService = userService;
     }
 
-
     @GetMapping("/list")
     public List<UserModel> listUsers(){
         return userService.listUsers();
