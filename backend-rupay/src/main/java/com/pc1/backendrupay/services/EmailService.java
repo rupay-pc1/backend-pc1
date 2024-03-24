@@ -18,7 +18,7 @@ public class EmailService {
         email.setSubject(subject);
         email.setText(body);
         email.setTo(userEmail);
-        email.setFrom("luiz.cardozo@ccc.ufcg.edu.br");
+        email.setFrom("rupay.cg@gmail.com");
         return email;
     }
 }
