@@ -39,10 +39,6 @@ public class TicketServiceImpl implements TicketService{
         if (user.getTickets() == null) {
             user.setTickets(new ArrayList<TicketModel>());
         }
-        // ADMIN,
-        //    STUDENT,
-        //    EXTERNAL,
-        //    SCHOLARSHIP_STUDENT
 
         if (user.getTypeUser() == TypeUser.STUDENT){
             LUNCH_PRICE = 5.72;
@@ -52,7 +48,7 @@ public class TicketServiceImpl implements TicketService{
             LUNCH_PRICE = 0.0;
             DINNER_PRICE = 0.0;
         }
-        else{
+        else {
             LUNCH_PRICE = LUNCH_PRICE;
             DINNER_PRICE = DINNER_PRICE;
         }
