@@ -1,5 +1,6 @@
 package com.pc1.backendrupay.services;
 
+import com.pc1.backendrupay.domain.TicketModel;
 import com.pc1.backendrupay.domain.UserDTO;
 import com.pc1.backendrupay.domain.UserModel;
 import com.pc1.backendrupay.repositories.UserRepository;
@@ -36,6 +37,18 @@ public class UserServiceImpl  implements UserService{
     @Override
     public Optional<UserModel> getUserByName(String name) {
         return userRepository.findByName(name);
+    }
+
+    @Override
+    public UserModel getUserId(UUID id) throws UserNotFoundException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException());
+    }
+    @Override
+    public UserModel getUserStringId(String id) throws UserNotFoundException {
+        UUID userId = UUID.fromString(id);
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException());
     }
     @Override
     public List<UserModel> listUsers() {
@@ -100,6 +113,18 @@ public class UserServiceImpl  implements UserService{
     @Override
     public Optional<UserModel> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public void saveUser(UserModel user) {
+        userRepository.save(user);
+    }
+
+    public String insertTicket(UUID id, TicketModel ticket)
+            throws UserNotFoundException {
+        UserModel user = getUserId(id);
+        user.addTicket(ticket);
+        saveUser(user);
+        return "";
     }
 
 }

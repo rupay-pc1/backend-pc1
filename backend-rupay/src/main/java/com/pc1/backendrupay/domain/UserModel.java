@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
@@ -38,20 +39,23 @@ public class UserModel implements UserDetails, Serializable {
     @Enumerated(EnumType.STRING)
     private TypeUser typeUser;
     private String registration; // Optional attribute
+    @OneToMany(cascade = CascadeType.PERSIST)
+    private List<TicketModel> tickets;
+
 
     /**
      * Constructor for the UserModel class that takes a UserDTO object as a parameter.
-     * 
+     *
      * @param userDTO the UserDTO object containing the user data
      */
-    public UserModel(UserDTO userDTO){
+    public UserModel(UserDTO userDTO) {
         this.name = userDTO.name();
         this.email = userDTO.email();
         this.password = userDTO.password();
         this.typeUser = userDTO.typeUser();
         this.registration = userDTO.registration();
+        this.tickets = new ArrayList<TicketModel>();
     }
-
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -83,4 +87,11 @@ public class UserModel implements UserDetails, Serializable {
     public boolean isEnabled() {
         return true;
     }
+
+    public void addTicket(TicketModel ticket) {
+        tickets.add(ticket);
+
+    }
+
 }
+
