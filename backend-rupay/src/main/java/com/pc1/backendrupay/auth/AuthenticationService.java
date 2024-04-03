@@ -4,16 +4,23 @@ package com.pc1.backendrupay.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pc1.backendrupay.configs.JwtService;
 import com.pc1.backendrupay.enums.TypeUser;
+import com.pc1.backendrupay.exceptions.InvalidTokenException;
 import com.pc1.backendrupay.exceptions.RegistrationInUseException;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.UserRepository;
+import com.pc1.backendrupay.services.EmailService;
 import com.pc1.backendrupay.token.Token;
 import com.pc1.backendrupay.token.TokenRepository;
 import com.pc1.backendrupay.token.TokenType;
+
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -21,7 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.pc1.backendrupay.domain.UserModel;
 
-
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 @Service
@@ -32,6 +39,10 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EmailService emailService;
+
+    @Autowired
+    private JavaMailSender mailSender;
 
     public AuthenticationResponse register(RegisterRequest request) throws RegistrationInUseException{
         checkRegistration(request.getRegistration());
@@ -86,6 +97,39 @@ public class AuthenticationService {
                 .refreshToken(refreshToken)
 
                 .build();
+    }
+
+    public boolean resetPassword(String email) throws UserNotFoundException{
+        var user = repository.findByEmail(email)
+                .orElseThrow();
+        var jwtToken = jwtService.generateToken(user);
+        saveUserToken(user, jwtToken);
+
+        //mailSender.send(emailService.constructResetTokenEmail("http://localhost:8081", jwtToken, email));
+        try {
+            emailService.constructResetTokenEmail("http://localhost:8081", jwtToken, email);
+        } catch (FileNotFoundException | MessagingException e) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void changePassword(String token, String password) throws UserNotFoundException, InvalidTokenException{
+        var email = jwtService.extractUsername(token.toString());
+        if (email == null) throw new UserNotFoundException("User not found");
+
+        var user = repository.findByEmail(email)
+                .orElseThrow();
+        var jwt = tokenRepository.findByToken(token) 
+                    .orElse(null);
+
+        if(jwt != null && !jwt.isRevoked() && jwtService.isTokenValid(token, user)) {
+            user.setPassword(passwordEncoder.encode(password));
+            revokeAllUserTokens(user);
+            repository.save(user);
+        }
+        else throw new InvalidTokenException("Invalid token");
     }
 
     private void saveUserToken(UserModel user, String jwtToken) {
@@ -156,7 +200,7 @@ public class AuthenticationService {
 
     private void checkRegistration(String registration) throws RegistrationInUseException{
         for (UserModel user : repository.findAll()) {
-            if (user.getRegistration().replaceAll("\\s", "").equals(registration.replaceAll("\\s", ""))) {
+            if (!user.getRegistration().equals("") && user.getRegistration().replaceAll("\\s", "").equals(registration.replaceAll("\\s", ""))) {
                 throw new RegistrationInUseException("Registration already in use");
             }
         }
