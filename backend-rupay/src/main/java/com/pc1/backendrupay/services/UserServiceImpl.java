@@ -1,5 +1,6 @@
 package com.pc1.backendrupay.services;
 
+import com.pc1.backendrupay.domain.TicketModel;
 import com.pc1.backendrupay.domain.UserDTO;
 import com.pc1.backendrupay.domain.UserModel;
 import com.pc1.backendrupay.repositories.UserRepository;
@@ -37,6 +38,13 @@ public class UserServiceImpl  implements UserService{
     public Optional<UserModel> getUserByName(String name) {
         return userRepository.findByName(name);
     }
+
+    @Override
+    public UserModel getUserId(UUID id) throws UserNotFoundException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException());
+    }
+
     @Override
     public List<UserModel> listUsers() {
         return userRepository.findAll();
@@ -63,7 +71,7 @@ public class UserServiceImpl  implements UserService{
     @Override
     public UserModel editUser(UUID id, UserDTO userDTO) throws UserNotFoundException {
         checkUser(id);
-        
+
         UserModel user = userRepository.findById(id).get();
         user.setName(userDTO.name());
         user.setEmail(userDTO.email());
@@ -73,7 +81,7 @@ public class UserServiceImpl  implements UserService{
 
         return userRepository.save(user);
     }
-    
+
     /**
      * Deletes aLong user by their ID.
      * @param id the ID of the user to delete
@@ -100,6 +108,18 @@ public class UserServiceImpl  implements UserService{
     @Override
     public Optional<UserModel> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public void saveUser(UserModel user) {
+        userRepository.save(user);
+    }
+
+    public String insertTicket(UUID id, TicketModel ticket)
+            throws UserNotFoundException {
+        UserModel user = getUserId(id);
+        user.addTicket(ticket);
+        saveUser(user);
+        return "";
     }
 
 }

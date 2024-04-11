@@ -6,11 +6,13 @@ import com.pc1.backendrupay.enums.TypeTicket;
 import com.pc1.backendrupay.enums.TypeUser;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.TicketRepository;
+import com.pc1.backendrupay.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -23,11 +25,15 @@ public class TicketServiceImpl implements TicketService{
     final private TicketRepository ticketRepository;
 
     @Autowired
+    final private UserRepository userRepository;
+
+    @Autowired
     final private UserService userService;
 
-    public TicketServiceImpl(TicketRepository ticketRepository, UserService userService) {
+    public TicketServiceImpl(TicketRepository ticketRepository, UserService userService, UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public List<TicketModel> listTypeTickets(){
@@ -62,4 +68,5 @@ public class TicketServiceImpl implements TicketService{
 
         return ticket;
     }
+
 }

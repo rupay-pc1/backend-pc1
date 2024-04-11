@@ -5,6 +5,7 @@ import com.pc1.backendrupay.enums.TypeTicket;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface TicketService {
