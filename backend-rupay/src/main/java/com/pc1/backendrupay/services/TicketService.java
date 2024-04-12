@@ -11,4 +11,8 @@ import java.util.UUID;
 public interface TicketService {
     public TicketModel buyTicket(UUID id, TypeTicket typeTicket) throws UserNotFoundException;
     public List<TicketModel> listTypeTickets();
+    public List<TicketModel> listTicketByUserId(UUID id) throws UserNotFoundException;
+    public Optional<TicketModel> consultTicketById(UUID id);
+
+    public List<TicketModel> listTicketsActives(UUID id) throws UserNotFoundException;
 }

@@ -31,8 +31,23 @@ public class TicketController {
     }
 
     @GetMapping
-    public List<TicketModel> listTickets(){
+    public List<TicketModel> listTickets() {
         return ticketService.listTypeTickets();
+    }
+
+    @GetMapping("/listTicketsByUserId/{id}")
+    public List<TicketModel> listTicketsByUserId(@PathVariable("id") UUID id) throws UserNotFoundException {
+        return ticketService.listTicketByUserId(id);
+    }
+
+    @GetMapping("/consultTicketById/{id}")
+    public Optional<TicketModel> consultTicketById(@PathVariable("id") UUID id){
+        return ticketService.consultTicketById(id);
+    }
+
+    @GetMapping("/listActivesTicketsByUserId/{id}")
+    public List<TicketModel> listActivesTicketsByUserId(@PathVariable("id") UUID id) throws UserNotFoundException {
+        return ticketService.listTicketsActives(id);
     }
 
 

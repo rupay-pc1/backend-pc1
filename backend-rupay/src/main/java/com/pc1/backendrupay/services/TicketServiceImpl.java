@@ -4,6 +4,7 @@ import com.pc1.backendrupay.domain.TicketModel;
 import com.pc1.backendrupay.domain.UserModel;
 import com.pc1.backendrupay.enums.TypeTicket;
 import com.pc1.backendrupay.enums.TypeUser;
+import com.pc1.backendrupay.enums.statusTicket.StatusTicket;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.TicketRepository;
 import com.pc1.backendrupay.repositories.UserRepository;
@@ -46,27 +47,51 @@ public class TicketServiceImpl implements TicketService{
             user.setTickets(new ArrayList<TicketModel>());
         }
 
-        if (user.getTypeUser() == TypeUser.STUDENT){
+        if (user.getTypeUser() == TypeUser.STUDENT) {
             LUNCH_PRICE = 5.72;
             DINNER_PRICE = 5.45;
-        }
-        else if (user.getTypeUser() == TypeUser.SCHOLARSHIP_STUDENT){
+        } else if (user.getTypeUser() == TypeUser.SCHOLARSHIP_STUDENT) {
             LUNCH_PRICE = 0.0;
             DINNER_PRICE = 0.0;
-        }
-        else {
+        } else {
             LUNCH_PRICE = LUNCH_PRICE;
             DINNER_PRICE = DINNER_PRICE;
         }
 
         Double price = typeTicket == TypeTicket.LUNCH ? LUNCH_PRICE : DINNER_PRICE;
 
-        TicketModel ticket = new TicketModel(price, typeTicket);
+        TicketModel ticket = new TicketModel(price, typeTicket, StatusTicket.ACTIVE);
         ticketRepository.save(ticket);
         user.getTickets().add(ticket);
         userService.saveUser(user);
 
         return ticket;
     }
+
+    public List<TicketModel> listTicketByUserId(UUID id) throws UserNotFoundException {
+        UserModel user = userService.getUserId(id);
+        List<TicketModel> tickets = user.getTickets();
+        return tickets;
+    }
+
+    public Optional<TicketModel> consultTicketById(UUID id){
+        Optional<TicketModel> ticket = ticketRepository.findById(id);
+        return ticket;
+    }
+
+    public List<TicketModel> listTicketsActives(UUID id) throws UserNotFoundException {
+        UserModel user = userService.getUserId(id);
+        List<TicketModel> allTickets = user.getTickets();
+        List<TicketModel> activesTickets = new ArrayList<>();
+
+        for (TicketModel t : allTickets){
+            if (t.getStatusTicket() == StatusTicket.ACTIVE){
+                activesTickets.add(t);
+            }
+        }
+
+        return activesTickets;
+    }
+
 
 }
