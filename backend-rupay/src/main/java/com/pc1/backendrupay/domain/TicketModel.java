@@ -22,7 +22,6 @@ public class TicketModel {
     private Double price;
     private TypeTicket typeTicket;
     private StatusTicket statusTicket;
-    private String paymentId;
 
     public TicketModel(Double price, TypeTicket typeTicket, StatusTicket statusTicket){
         this.price = price;

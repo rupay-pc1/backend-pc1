@@ -32,14 +32,10 @@ public class TicketServiceImpl implements TicketService{
     @Autowired
     final private UserService userService;
 
-    @Autowired
-    final private PaymentService paymentService;
-
-    public TicketServiceImpl(TicketRepository ticketRepository, UserService userService, UserRepository userRepository, PaymentService paymentService) {
+    public TicketServiceImpl(TicketRepository ticketRepository, UserService userService, UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
         this.userService = userService;
         this.userRepository = userRepository;
-        this.paymentService = paymentService;
     }
 
     public List<TicketModel> listTypeTickets(){
@@ -65,12 +61,16 @@ public class TicketServiceImpl implements TicketService{
 
         Double price = typeTicket == TypeTicket.LUNCH ? LUNCH_PRICE : DINNER_PRICE;
 
-        TicketModel ticket = new TicketModel(price, typeTicket, StatusTicket.ACTIVE);
+        TicketModel ticket = new TicketModel(price, typeTicket, StatusTicket.INACTIVE);
         ticketRepository.save(ticket);
         user.getTickets().add(ticket);
         userService.saveUser(user);
         return ticket;
 
+    }
+    public TicketModel createTicket(UUID id, TypeTicket typeTicket) throws UserNotFoundException, StripeException {
+        TicketModel newTicket = buyTicket(id, typeTicket);
+        return newTicket;
     }
 
     public List<TicketModel> listTicketByUserId(UUID id) throws UserNotFoundException {

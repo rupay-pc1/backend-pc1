@@ -1,84 +1,85 @@
 package com.pc1.backendrupay.controllers;
 
+import com.pc1.backendrupay.domain.RequestPaymentDTO;
 import com.pc1.backendrupay.domain.TicketModel;
-import com.pc1.backendrupay.services.PaymentService;
+import com.pc1.backendrupay.domain.UserModel;
+import com.pc1.backendrupay.enums.TypeTicket;
+import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.services.TicketService;
+import com.pc1.backendrupay.services.UserService;
+import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
-import com.stripe.model.Token;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
 
-    @Autowired
-    private PaymentService paymentService;
+    @Value("${stripe.secretKey}")
+    private String stripeSecretKey;
     @Autowired
     private TicketService ticketService;
 
-    public PaymentController(PaymentService paymentService, TicketService ticketService) {
-        this.paymentService = paymentService;
+    @Autowired
+    private UserService userService;
+
+    public PaymentController(TicketService ticketService, UserService userService) {
         this.ticketService = ticketService;
+        this.userService = userService;
+    }
+    @PostMapping("/checkout/{userId}/{typeTicket}")
+    private RequestPaymentDTO hostedCheckout(@PathVariable("typeTicket") TypeTicket typeTicket, @PathVariable("userId") UUID userId) throws StripeException, UserNotFoundException {
+        Stripe.apiKey = stripeSecretKey;
+
+        String student_lunch_ticket = "price_1P8q7mBo6B2t81e5yglSzDMW";
+        String student_dinner_ticket = "price_1P8q8zBo6B2t81e5AooceLcg";
+        String external_lunch_ticket = "price_1P8pw2Bo6B2t81e57QS53n1I";
+        String external_dinner_ticket = "price_1P8q79Bo6B2t81e5O5rtwzQs";
+        String scholarship_lunch_ticket = "price_1P8q9oBo6B2t81e5q31Eat9u";
+        String scholarship_dinner_ticket = "price_1P8q9oBo6B2t81e5q31Eat9u";
+
+        UserModel user = userService.getUserId(userId);
+
+        TicketModel newTicket = ticketService.createTicket(userId, typeTicket);
+
+        String priceId;
+
+        switch(newTicket.getTypeTicket()){
+            case STUDENT_LUNCH_TICKET -> priceId = student_lunch_ticket;
+            case STUDENT_DINNER_TICKET -> priceId = student_dinner_ticket;
+            case EXTERNAL_LUNCH_TICKET -> priceId = external_lunch_ticket;
+            case EXTERNAL_DINNER_TICKET -> priceId = external_dinner_ticket;
+            case SCHOLARSHIP_LUNCH_TICKET -> priceId = scholarship_lunch_ticket;
+            case SCHOLARSHIP_DINNER_TICKET -> priceId = scholarship_dinner_ticket;
+            default -> priceId = external_dinner_ticket;
+        }
+
+        SessionCreateParams params =
+                SessionCreateParams.builder()
+                        .addLineItem(
+                                SessionCreateParams.LineItem.builder()
+                                        .setPrice(priceId)
+                                        .setQuantity(1L)
+                                        .build()
+                        )
+                        .setMode(SessionCreateParams.Mode.PAYMENT)
+                        .setSuccessUrl("https://example.com/success")
+                        .build();
+
+        Session session = Session.create(params);
+        RequestPaymentDTO rpDTO = new RequestPaymentDTO(session.getUrl(), userId);
+
+        return rpDTO;
     }
 
-    @PostMapping("/create-intent/{ticketId}")
-    @ResponseBody
-    public ResponseEntity<String> createPaymentIntent(@PathVariable UUID ticketId) {
-        try {
-            Optional<TicketModel> ticket = ticketService.consultTicketById(ticketId);
-            if (ticket == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket not found");
-            }
-            Double price = ticket.get().getPrice();
-            String paymentIntentId = paymentService.createPaymentIntent(price, "brl"); //
-            return ResponseEntity.ok().body(paymentIntentId);
-        } catch (StripeException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating payment");
-        }
-    }
-
-    @PostMapping("/confirm/{paymentIntentId}")
-    public String confirmPayment(@PathVariable String paymentIntentId) {
-        try {
-            paymentService.confirmPaymentIntent(paymentIntentId);
-            return "Pagamento confirmado com sucesso!";
-        } catch (StripeException e) {
-            return "Erro ao confirmar o pagamento: " + e.getMessage();
-        }
-    }
-
-    @PostMapping("/confirm-payment-intent/{paymentIntentId}/{paymentMethodId}")
-    public ResponseEntity<String> confirmPaymentIntent(@PathVariable String paymentIntentId,
-                                                       @PathVariable String paymentMethodId) {
-        try {
-            PaymentIntent paymentIntent = paymentService.confirmPaymentIntentN(paymentIntentId, paymentMethodId);
-            return new ResponseEntity<>(paymentIntent.getStatus(), HttpStatus.OK);
-        } catch (StripeException e) {
-            e.printStackTrace();
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @GetMapping("/status/{paymentId}")
-    public ResponseEntity<?> checkPaymentStatus(@PathVariable String paymentId) {
-        try {
-            PaymentIntent paymentIntent = paymentService.getPaymentStatus(paymentId);
-            return ResponseEntity.ok().body(paymentIntent.getStatus());
-        } catch (StripeException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao verificar o status do pagamento");
-        }
-    }
 }
 
