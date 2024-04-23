@@ -39,6 +39,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers("/error/**").permitAll();
                     auth.requestMatchers("/api/**").permitAll();
                     auth.requestMatchers("/api/auth/**").permitAll();
+                    auth.requestMatchers("/payment/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

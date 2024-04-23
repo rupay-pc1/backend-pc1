@@ -8,6 +8,7 @@ import com.pc1.backendrupay.enums.statusTicket.StatusTicket;
 import com.pc1.backendrupay.exceptions.UserNotFoundException;
 import com.pc1.backendrupay.repositories.TicketRepository;
 import com.pc1.backendrupay.repositories.UserRepository;
+import com.stripe.exception.StripeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,17 +32,21 @@ public class TicketServiceImpl implements TicketService{
     @Autowired
     final private UserService userService;
 
-    public TicketServiceImpl(TicketRepository ticketRepository, UserService userService, UserRepository userRepository) {
+    @Autowired
+    final private PaymentService paymentService;
+
+    public TicketServiceImpl(TicketRepository ticketRepository, UserService userService, UserRepository userRepository, PaymentService paymentService) {
         this.ticketRepository = ticketRepository;
         this.userService = userService;
         this.userRepository = userRepository;
+        this.paymentService = paymentService;
     }
 
     public List<TicketModel> listTypeTickets(){
         return ticketRepository.findAll();
     }
 
-    public TicketModel buyTicket(UUID id, TypeTicket typeTicket) throws UserNotFoundException {
+    public TicketModel buyTicket(UUID id, TypeTicket typeTicket) throws UserNotFoundException, StripeException {
         UserModel user = userService.getUserId(id);
         if (user.getTickets() == null) {
             user.setTickets(new ArrayList<TicketModel>());
@@ -64,8 +69,8 @@ public class TicketServiceImpl implements TicketService{
         ticketRepository.save(ticket);
         user.getTickets().add(ticket);
         userService.saveUser(user);
-
         return ticket;
+
     }
 
     public List<TicketModel> listTicketByUserId(UUID id) throws UserNotFoundException {
