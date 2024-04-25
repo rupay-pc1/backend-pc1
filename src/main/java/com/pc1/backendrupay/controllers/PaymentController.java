@@ -36,7 +36,7 @@ public class PaymentController {
         this.ticketService = ticketService;
         this.userService = userService;
     }
-    @PostMapping("/checkout/{userId}/{typeTicket}")
+    @GetMapping("/checkout/{userId}/{typeTicket}")
     private RequestPaymentDTO hostedCheckout(@PathVariable("typeTicket") TypeTicket typeTicket, @PathVariable("userId") UUID userId) throws StripeException, UserNotFoundException {
         //TODO falta implementar uma verificação de segurança para garantir que o usuário que está fazendo a requisição tem permissão para comprar o tipo de  ticket passado
         Stripe.apiKey = stripeSecretKey;
