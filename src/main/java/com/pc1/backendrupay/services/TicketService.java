@@ -18,4 +18,6 @@ public interface TicketService {
     public List<TicketModel> listTicketsActives(UUID id) throws UserNotFoundException;
 
     void updateTicketStatusToActive(UUID ticketId);
+
+    void updateTicketStatusToInactive(UUID ticketId);
 }
