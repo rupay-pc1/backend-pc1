@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/api/payment")
 public class PaymentController {
 
     @Value("${stripe.secretKey}")
@@ -38,6 +38,7 @@ public class PaymentController {
     }
     @PostMapping("/checkout/{userId}/{typeTicket}")
     private RequestPaymentDTO hostedCheckout(@PathVariable("typeTicket") TypeTicket typeTicket, @PathVariable("userId") UUID userId) throws StripeException, UserNotFoundException {
+        //TODO falta implementar uma verificação de segurança para garantir que o usuário que está fazendo a requisição tem permissão para comprar o tipo de  ticket passado
         Stripe.apiKey = stripeSecretKey;
 
         String student_lunch_ticket = "price_1P8q7mBo6B2t81e5yglSzDMW";
@@ -72,7 +73,8 @@ public class PaymentController {
                                         .build()
                         )
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl("https://example.com/success")
+                        .setSuccessUrl("https://backend-pc1.onrender.com/my-tickets")
+                        .setCancelUrl("https://backend-pc1.onrender.com/my-tickets")
                         .build();
 
         Session session = Session.create(params);

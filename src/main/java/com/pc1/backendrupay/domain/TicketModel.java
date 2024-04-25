@@ -5,6 +5,8 @@ import com.pc1.backendrupay.enums.TypeTicket;
 import com.pc1.backendrupay.enums.statusTicket.StatusTicket;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -22,11 +24,14 @@ public class TicketModel {
     private Double price;
     private TypeTicket typeTicket;
     private StatusTicket statusTicket;
+    private LocalDateTime purchaseDate;
+
 
     public TicketModel(Double price, TypeTicket typeTicket, StatusTicket statusTicket){
         this.price = price;
         this.typeTicket = typeTicket;
         this.statusTicket = statusTicket;
+        this.purchaseDate = LocalDateTime.now();
     }
 
 

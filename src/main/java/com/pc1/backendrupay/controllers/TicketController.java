@@ -59,5 +59,15 @@ public class TicketController {
         return ticketService.listTicketsActives(id);
     }
 
+    @PutMapping("/updateTicketStatusToActive/{ticketId}")
+    public ResponseEntity<?> updateTicketStatusToActive(@PathVariable UUID ticketId) {
+        try {
+            ticketService.updateTicketStatusToActive(ticketId);
+            return ResponseEntity.ok().body("Status do ticket atualizado com sucesso");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao atualizar o status do ticket");
+        }
+    }
+
 
 }

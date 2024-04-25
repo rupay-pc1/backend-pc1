@@ -98,5 +98,16 @@ public class TicketServiceImpl implements TicketService{
         return activesTickets;
     }
 
+    @Override
+    public void updateTicketStatusToActive(UUID ticketId) {
+        Optional<TicketModel> ticket = ticketRepository.findById(ticketId);
+        if (ticket.isEmpty()) {
+            throw new RuntimeException("Ticket not found");
+        }
+        TicketModel newTicket = ticket.get();
+        newTicket.setStatusTicket(StatusTicket.ACTIVE);
+        ticketRepository.save(newTicket);
+    }
+
 
 }
