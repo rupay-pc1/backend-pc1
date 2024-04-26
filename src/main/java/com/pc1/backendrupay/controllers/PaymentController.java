@@ -73,8 +73,8 @@ public class PaymentController {
                                         .build()
                         )
                         .setMode(SessionCreateParams.Mode.PAYMENT)
-                        .setSuccessUrl("https://backend-pc1.onrender.com/my-tickets")
-                        .setCancelUrl("https://backend-pc1.onrender.com/my-tickets")
+                        .setSuccessUrl("https://rupay-frontend.vercel.app/my-tickets")
+                        .setCancelUrl("https://rupay-frontend.vercel.app/my-tickets")
                         .build();
 
         Session session = Session.create(params);
