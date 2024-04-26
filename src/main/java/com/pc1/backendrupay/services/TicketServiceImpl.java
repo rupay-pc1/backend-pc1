@@ -61,7 +61,7 @@ public class TicketServiceImpl implements TicketService{
 
         Double price = typeTicket == TypeTicket.LUNCH ? LUNCH_PRICE : DINNER_PRICE;
 
-        TicketModel ticket = new TicketModel(price, typeTicket, StatusTicket.INACTIVE);
+        TicketModel ticket = new TicketModel(price, typeTicket, StatusTicket.ACTIVE);
         ticketRepository.save(ticket);
         user.getTickets().add(ticket);
         userService.saveUser(user);
